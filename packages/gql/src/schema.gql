@@ -1,0 +1,89 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Warehouse {
+  """id of the warehouse"""
+  id: Int!
+
+  """name of the warehouse"""
+  name: String!
+
+  """size capacity of the warehouse"""
+  size: Int!
+}
+
+type Product {
+  """id of the product"""
+  id: Int!
+
+  """name of the product"""
+  name: String!
+
+  """size per unit"""
+  size: Int!
+
+  """is product hazardous"""
+  hazardous: Boolean!
+}
+
+type Query {
+  getHello: String!
+  warehouses: [Warehouse!]!
+  warehouse(id: Int!): Warehouse!
+  products: [Product!]!
+  product(id: Int!): Product!
+}
+
+type Mutation {
+  createWarehouse(createWarehouseInput: CreateWarehouseInput!): Warehouse!
+  updateWarehouse(updateWarehouseInput: UpdateWarehouseInput!): Warehouse!
+  removeWarehouse(id: Int!): Warehouse!
+  createProduct(createProductInput: CreateProductInput!): Product!
+  updateProduct(updateProductInput: UpdateProductInput!): Product!
+  removeProduct(id: Int!): Product!
+}
+
+input CreateWarehouseInput {
+  """name of the warehouse"""
+  name: String!
+
+  """size of the warehouse"""
+  size: Int!
+}
+
+input UpdateWarehouseInput {
+  """name of the warehouse"""
+  name: String!
+
+  """size of the warehouse"""
+  size: Int!
+
+  """id of the warehouse"""
+  id: Int!
+}
+
+input CreateProductInput {
+  """name of the warehouse"""
+  name: String!
+
+  """size of the product per unit"""
+  size: Int!
+
+  """is product hazardous"""
+  hazardous: Boolean!
+}
+
+input UpdateProductInput {
+  """name of the warehouse"""
+  name: String!
+
+  """size of the product per unit"""
+  size: Int!
+
+  """is product hazardous"""
+  hazardous: Boolean!
+
+  """id of the product"""
+  id: Int!
+}

@@ -1,0 +1,22 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@apollo/server": "^4.9.5",
+    "@nestjs/apollo": "^12.0.11",
+    "@nestjs/graphql": "^12.0.11",
+    "@nestjs/typeorm": "^10.0.1",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.3",
+    "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "lerna": "^7.4.2"
+  },
+  "scripts": {
+    "start:dev": "lerna run start:dev --parallel"
+  }
+}
