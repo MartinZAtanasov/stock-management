@@ -28,7 +28,6 @@ type Product {
 }
 
 type Query {
-  getHello: String!
   warehouses: [Warehouse!]!
   warehouse(id: Int!): Warehouse!
   products: [Product!]!

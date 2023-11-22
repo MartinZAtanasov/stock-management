@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppResolver } from './app.resolver';
-import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -31,6 +29,6 @@ import { Product } from './product/entities/product.entity';
     ProductModule,
   ],
   controllers: [],
-  providers: [AppService, AppResolver],
+  providers: [],
 })
 export class AppModule {}
