@@ -20,4 +20,12 @@ export class Warehouse {
   @OneToMany(() => Shipment, (shipment) => shipment.warehouse)
   @Field(() => [Shipment], { description: 'size capacity of the warehouse' })
   shipments: Shipment[];
+
+  @Column('int', { default: 0 })
+  @Field(() => Int, { description: 'available size of the warehouse' })
+  availableSize: number;
+
+  @Column('int', { default: 0 })
+  @Field(() => Int, { description: 'taken size of the warehouse' })
+  takenSize: number;
 }

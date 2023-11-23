@@ -38,6 +38,12 @@ type Warehouse {
 
   """size capacity of the warehouse"""
   shipments: [Shipment!]!
+
+  """available size of the warehouse"""
+  availableSize: Int!
+
+  """taken size of the warehouse"""
+  takenSize: Int!
 }
 
 type Product {

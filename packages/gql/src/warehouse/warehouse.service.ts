@@ -14,10 +14,11 @@ export class WarehouseService {
 
   create(createWarehouseInput: CreateWarehouseInput) {
     const newWarehouse = this.warehouseRepository.create(createWarehouseInput);
+    newWarehouse.availableSize = createWarehouseInput.size;
     return this.warehouseRepository.save(newWarehouse);
   }
 
-  findAll(): Promise<Warehouse[]> {
+  async findAll(): Promise<Warehouse[]> {
     return this.warehouseRepository.find({ relations: { shipments: true } });
   }
 
