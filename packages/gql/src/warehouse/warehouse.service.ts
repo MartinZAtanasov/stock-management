@@ -23,7 +23,10 @@ export class WarehouseService {
   }
 
   findOne(id: number) {
-    return this.warehouseRepository.findOneBy({ id });
+    return this.warehouseRepository.findOne({
+      where: { id },
+      relations: { shipments: true },
+    });
   }
 
   async update(updateWarehouseInput: UpdateWarehouseInput) {

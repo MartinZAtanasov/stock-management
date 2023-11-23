@@ -5,12 +5,15 @@ import {
   GraphQLISODateTime,
   registerEnumType,
 } from '@nestjs/graphql';
+import { Product } from 'src/product/entities/product.entity';
 import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -44,4 +47,13 @@ export class Shipment {
     enum: ShipmentType,
   })
   type: ShipmentType;
+
+  @Field(() => Int, { description: 'quantity of the product' })
+  @Column('int')
+  quantity: number;
+
+  @OneToOne(() => Product)
+  @JoinColumn()
+  @Field(() => Product, { description: 'product' })
+  product: Product;
 }

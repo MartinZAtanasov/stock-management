@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Product {
+  """id of the product"""
+  id: Int!
+
+  """name of the product"""
+  name: String!
+
+  """size per unit"""
+  size: Int!
+
+  """is product hazardous"""
+  hazardous: Boolean!
+}
+
 type Shipment {
   """id of the shipment"""
   id: Int!
@@ -14,6 +28,12 @@ type Shipment {
 
   """shipment type"""
   type: ShipmentType!
+
+  """quantity of the product"""
+  quantity: Int!
+
+  """product"""
+  product: Product!
 }
 
 """
@@ -44,20 +64,6 @@ type Warehouse {
 
   """taken size of the warehouse"""
   takenSize: Int!
-}
-
-type Product {
-  """id of the product"""
-  id: Int!
-
-  """name of the product"""
-  name: String!
-
-  """size per unit"""
-  size: Int!
-
-  """is product hazardous"""
-  hazardous: Boolean!
 }
 
 type Query {
@@ -129,6 +135,12 @@ input CreateShipmentInput {
   """warehouse id"""
   warehouse: Int!
 
+  """product id"""
+  product: Int!
+
+  """product quantity"""
+  quantity: Int!
+
   """shipment type"""
   type: ShipmentType!
 }
@@ -136,6 +148,12 @@ input CreateShipmentInput {
 input UpdateShipmentInput {
   """warehouse id"""
   warehouse: Int
+
+  """product id"""
+  product: Int
+
+  """product quantity"""
+  quantity: Int
 
   """shipment type"""
   type: ShipmentType
