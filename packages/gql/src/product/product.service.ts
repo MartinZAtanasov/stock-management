@@ -25,9 +25,11 @@ export class ProductService {
     return this.productRepository.findOneBy({ id });
   }
 
-  update(updateProductInput: UpdateProductInput) {
-    const product = { ...new Product(), ...updateProductInput };
-    return this.productRepository.save(product);
+  async update(updateProductInput: UpdateProductInput) {
+    const product = await this.productRepository.findOneBy({
+      id: updateProductInput.id,
+    });
+    return this.productRepository.save({ ...product, ...updateProductInput });
   }
 
   remove(id: number) {

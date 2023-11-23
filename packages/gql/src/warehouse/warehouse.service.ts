@@ -18,16 +18,21 @@ export class WarehouseService {
   }
 
   findAll(): Promise<Warehouse[]> {
-    return this.warehouseRepository.find();
+    return this.warehouseRepository.find({ relations: { shipments: true } });
   }
 
   findOne(id: number) {
     return this.warehouseRepository.findOneBy({ id });
   }
 
-  update(updateWarehouseInput: UpdateWarehouseInput) {
-    const warehouse = { ...new Warehouse(), ...updateWarehouseInput };
-    return this.warehouseRepository.save(warehouse);
+  async update(updateWarehouseInput: UpdateWarehouseInput) {
+    const warehouse = await this.warehouseRepository.findOneBy({
+      id: updateWarehouseInput.id,
+    });
+    return this.warehouseRepository.save({
+      ...warehouse,
+      updateWarehouseInput,
+    });
   }
 
   remove(id: number) {

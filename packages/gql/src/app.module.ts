@@ -5,8 +5,7 @@ import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WarehouseModule } from './warehouse/warehouse.module';
 import { ProductModule } from './product/product.module';
-import { Warehouse } from './warehouse/entities/warehouse.entity';
-import { Product } from './product/entities/product.entity';
+import { ShipmentModule } from './shipment/shipment.module';
 
 @Module({
   imports: [
@@ -16,17 +15,18 @@ import { Product } from './product/entities/product.entity';
       playground: true,
     }),
     TypeOrmModule.forRoot({
+      autoLoadEntities: true,
       type: 'postgres',
       host: 'localhost',
       port: 5432,
       username: 'root',
       password: 'root',
       database: 'test',
-      entities: [Warehouse, Product],
       synchronize: true,
     }),
     WarehouseModule,
     ProductModule,
+    ShipmentModule,
   ],
   controllers: [],
   providers: [],
