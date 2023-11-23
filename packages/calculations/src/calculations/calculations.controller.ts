@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { CalculationsService } from './calculations.service';
 import { CalculateSizeAvailabilityDto } from './dto/calculate-size-availability';
+import { CalculateItemsSizeDto } from './dto/calculate-items-size';
 
 @Controller('calculations')
 export class CalculationsController {
@@ -13,5 +14,10 @@ export class CalculationsController {
     return this.calculationsService.calculateSizeAvailability(
       calculateSizeAvailabilityDto,
     );
+  }
+
+  @Post('calculate-items-size')
+  calculateItemsSize(@Body() calculateItemsSizeDto: CalculateItemsSizeDto) {
+    return this.calculationsService.calculateItemsSize(calculateItemsSizeDto);
   }
 }
