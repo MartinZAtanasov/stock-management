@@ -15,20 +15,27 @@ export class ShipmentService {
     private warehouseRepository: Repository<Warehouse>,
   ) {}
 
-  async create(createShipmentInput: CreateShipmentInput) {
+  async create(input: CreateShipmentInput) {
+    const { warehouse: warehouseId, ...createShipmentInput } = input;
+
     const warehouse = await this.warehouseRepository.findOneBy({
-      id: createShipmentInput.warehouse,
+      id: warehouseId,
     });
 
     const shipment = new Shipment();
     shipment.warehouse = warehouse;
 
-    const newShipment = this.shipmentRepository.create(shipment);
+    const newShipment = this.shipmentRepository.create({
+      ...shipment,
+      ...createShipmentInput,
+    });
     return this.shipmentRepository.save(newShipment);
   }
 
   findAll() {
-    return this.shipmentRepository.find({ relations: { warehouse: true } });
+    return this.shipmentRepository.find({
+      relations: { warehouse: true },
+    });
   }
 
   findOne(id: number) {

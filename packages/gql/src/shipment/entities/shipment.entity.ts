@@ -1,11 +1,27 @@
-import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
+import {
+  ObjectType,
+  Field,
+  Int,
+  GraphQLISODateTime,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+export enum ShipmentType {
+  EXPORT = 'export',
+  IMPORT = 'import',
+}
+
+registerEnumType(ShipmentType, {
+  name: 'ShipmentType',
+});
 
 @Entity()
 @ObjectType()
@@ -22,5 +38,10 @@ export class Shipment {
   @Field(() => Warehouse, { description: 'warehouse' })
   warehouse: Warehouse;
 
-  // products & amount
+  @Field(() => ShipmentType, { description: 'shipment type' })
+  @Column({
+    type: 'enum',
+    enum: ShipmentType,
+  })
+  type: ShipmentType;
 }

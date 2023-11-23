@@ -11,12 +11,20 @@ type Shipment {
 
   """warehouse"""
   warehouse: Warehouse!
+
+  """shipment type"""
+  type: ShipmentType!
 }
 
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+enum ShipmentType {
+  EXPORT
+  IMPORT
+}
 
 type Warehouse {
   """id of the warehouse"""
@@ -114,11 +122,17 @@ input UpdateProductInput {
 input CreateShipmentInput {
   """warehouse id"""
   warehouse: Int!
+
+  """shipment type"""
+  type: ShipmentType!
 }
 
 input UpdateShipmentInput {
   """warehouse id"""
   warehouse: Int
+
+  """shipment type"""
+  type: ShipmentType
 
   """timestamp of the shipment"""
   date: DateTime

@@ -31,7 +31,7 @@ export class WarehouseService {
     });
     return this.warehouseRepository.save({
       ...warehouse,
-      updateWarehouseInput,
+      ...updateWarehouseInput,
     });
   }
 
