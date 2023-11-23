@@ -22,17 +22,21 @@ export class ProductService {
   }
 
   findOne(id: number) {
-    return this.productRepository.findOneBy({ id });
+    return this.productRepository.findOneByOrFail({ id });
   }
 
   async update(updateProductInput: UpdateProductInput) {
-    const product = await this.productRepository.findOneBy({
+    const product = await this.productRepository.findOneByOrFail({
       id: updateProductInput.id,
     });
     return this.productRepository.save({ ...product, ...updateProductInput });
   }
 
-  remove(id: number) {
-    return this.productRepository.delete({ id });
+  async remove(id: number) {
+    const product = await this.productRepository.findOneOrFail({
+      where: { id },
+    });
+    await this.productRepository.delete({ id });
+    return product;
   }
 }

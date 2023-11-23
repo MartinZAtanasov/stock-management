@@ -13,7 +13,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -37,7 +36,9 @@ export class Shipment {
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   date: Date;
 
-  @ManyToOne(() => Warehouse, (warehouse) => warehouse.shipments)
+  @ManyToOne(() => Warehouse, (warehouse) => warehouse.shipments, {
+    onDelete: 'SET NULL',
+  })
   @Field(() => Warehouse, { description: 'warehouse' })
   warehouse: Warehouse;
 
@@ -52,7 +53,7 @@ export class Shipment {
   @Column('int')
   quantity: number;
 
-  @OneToOne(() => Product)
+  @ManyToOne(() => Product, { onDelete: 'SET NULL' })
   @JoinColumn()
   @Field(() => Product, { description: 'product' })
   product: Product;

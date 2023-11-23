@@ -25,11 +25,13 @@ export class ShipmentService {
       ...createShipmentInput
     } = input;
 
-    const warehouse = await this.warehouseRepository.findOneBy({
+    const warehouse = await this.warehouseRepository.findOneByOrFail({
       id: warehouseId,
     });
 
-    const product = await this.productRepository.findOneBy({ id: productId });
+    const product = await this.productRepository.findOneByOrFail({
+      id: productId,
+    });
 
     const shipment = new Shipment();
     shipment.warehouse = warehouse;
@@ -49,7 +51,7 @@ export class ShipmentService {
   }
 
   findOne(id: number) {
-    return this.shipmentRepository.findOne({
+    return this.shipmentRepository.findOneOrFail({
       where: { id },
       relations: { warehouse: true, product: true },
     });
@@ -62,19 +64,20 @@ export class ShipmentService {
       ...updateShipmentInput
     } = input;
 
-    const shipment = await this.shipmentRepository.findOneBy({
-      id: updateShipmentInput.id,
+    const shipment = await this.shipmentRepository.findOneOrFail({
+      where: { id: updateShipmentInput.id },
+      relations: { product: true, warehouse: true },
     });
 
     if (warehouseId) {
-      const warehouse = await this.warehouseRepository.findOneBy({
+      const warehouse = await this.warehouseRepository.findOneByOrFail({
         id: warehouseId,
       });
       shipment.warehouse = warehouse;
     }
 
     if (productId) {
-      const product = await this.productRepository.findOneBy({
+      const product = await this.productRepository.findOneByOrFail({
         id: productId,
       });
       shipment.product = product;
@@ -86,7 +89,12 @@ export class ShipmentService {
     });
   }
 
-  remove(id: number) {
-    return this.shipmentRepository.delete({ id });
+  async remove(id: number) {
+    const shipment = await this.shipmentRepository.findOneOrFail({
+      where: { id },
+      relations: { warehouse: true, product: true },
+    });
+    await this.shipmentRepository.delete({ id });
+    return shipment;
   }
 }

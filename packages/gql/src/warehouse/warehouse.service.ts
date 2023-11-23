@@ -23,14 +23,14 @@ export class WarehouseService {
   }
 
   findOne(id: number) {
-    return this.warehouseRepository.findOne({
+    return this.warehouseRepository.findOneOrFail({
       where: { id },
       relations: { shipments: true },
     });
   }
 
   async update(updateWarehouseInput: UpdateWarehouseInput) {
-    const warehouse = await this.warehouseRepository.findOneBy({
+    const warehouse = await this.warehouseRepository.findOneByOrFail({
       id: updateWarehouseInput.id,
     });
     return this.warehouseRepository.save({
@@ -39,7 +39,12 @@ export class WarehouseService {
     });
   }
 
-  remove(id: number) {
-    return this.warehouseRepository.delete({ id });
+  async remove(id: number) {
+    const warehouse = await this.warehouseRepository.findOneOrFail({
+      where: { id },
+      relations: { shipments: true },
+    });
+    await this.warehouseRepository.delete({ id });
+    return warehouse;
   }
 }
