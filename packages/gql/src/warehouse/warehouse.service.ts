@@ -4,12 +4,14 @@ import { UpdateWarehouseInput } from './dto/update-warehouse.input';
 import { Warehouse } from './entities/warehouse.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CalculationsService } from 'src/shared/calculations.service';
 
 @Injectable()
 export class WarehouseService {
   constructor(
     @InjectRepository(Warehouse)
     private warehouseRepository: Repository<Warehouse>,
+    private calculationsService: CalculationsService,
   ) {}
 
   create(createWarehouseInput: CreateWarehouseInput) {
@@ -19,6 +21,10 @@ export class WarehouseService {
   }
 
   async findAll(): Promise<Warehouse[]> {
+    const res = await this.calculationsService.calculateItemsSize({
+      items: [{ quantity: 1, sizePerUnit: 1 }],
+    });
+    console.log({ res });
     return this.warehouseRepository.find({ relations: { shipments: true } });
   }
 

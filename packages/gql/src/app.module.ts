@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WarehouseModule } from './warehouse/warehouse.module';
 import { ProductModule } from './product/product.module';
 import { ShipmentModule } from './shipment/shipment.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ShipmentModule } from './shipment/shipment.module';
     WarehouseModule,
     ProductModule,
     ShipmentModule,
+    SharedModule,
   ],
   controllers: [],
   providers: [],

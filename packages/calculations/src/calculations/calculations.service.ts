@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CalculateSizeAvailabilityDto } from './dto/calculate-size-availability';
-import { CalculateItemsSizeDto } from './dto/calculate-items-size';
+import { CalculateSizeAvailabilityDto } from './dto/calculate-size-availability.input';
+import { CalculateItemsSizeDto } from './dto/calculate-items-size.input';
 
 @Injectable()
 export class CalculationsService {
