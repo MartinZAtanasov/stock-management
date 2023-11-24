@@ -69,10 +69,15 @@ type Warehouse {
 type Query {
   warehouses: [Warehouse!]!
   warehouse(id: Int!): Warehouse!
-  products: [Product!]!
+  products(productsFilterInput: ProductsFilterInput): [Product!]!
   product(id: Int!): Product!
   shipments: [Shipment!]!
   shipment(id: Int!): Shipment!
+}
+
+input ProductsFilterInput {
+  """is product hazardous"""
+  hazardous: Boolean
 }
 
 type Mutation {

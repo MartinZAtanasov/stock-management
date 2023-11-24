@@ -4,6 +4,7 @@ import { UpdateProductInput } from './dto/update-product.input';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ProductsFilterInput } from './dto/products-filter-input';
 
 @Injectable()
 export class ProductService {
@@ -17,8 +18,8 @@ export class ProductService {
     return this.productRepository.save(newProduct);
   }
 
-  findAll() {
-    return this.productRepository.find();
+  findAll(productsFilterInput: ProductsFilterInput) {
+    return this.productRepository.find({ where: productsFilterInput });
   }
 
   findOne(id: number) {
