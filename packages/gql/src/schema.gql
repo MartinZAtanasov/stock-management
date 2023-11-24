@@ -46,6 +46,20 @@ enum ShipmentType {
   IMPORT
 }
 
+type WarehouseProduct {
+  """id of the warehouse product"""
+  id: Int!
+
+  """quantity of the warehouse product"""
+  quantity: Int!
+
+  """warehouse"""
+  warehouse: Warehouse
+
+  """product"""
+  product: Product
+}
+
 type Warehouse {
   """id of the warehouse"""
   id: Int!
@@ -64,6 +78,9 @@ type Warehouse {
 
   """taken size of the warehouse"""
   takenSize: Int!
+
+  """stocked products in the warehouse"""
+  products: [WarehouseProduct!]!
 }
 
 type Query {
@@ -73,6 +90,7 @@ type Query {
   product(id: Int!): Product!
   shipments: [Shipment!]!
   shipment(id: Int!): Shipment!
+  warehouseProduct(id: Int!): WarehouseProduct!
 }
 
 input ProductsFilterInput {
@@ -90,6 +108,9 @@ type Mutation {
   createShipment(createShipmentInput: CreateShipmentInput!): Shipment!
   updateShipment(updateShipmentInput: UpdateShipmentInput!): Shipment!
   removeShipment(id: Int!): Shipment!
+  createWarehouseProduct(createWarehouseProductInput: CreateWarehouseProductInput!): WarehouseProduct!
+  updateWarehouseProduct(updateWarehouseProductInput: UpdateWarehouseProductInput!): WarehouseProduct!
+  removeWarehouseProduct(id: Int!): WarehouseProduct!
 }
 
 input CreateWarehouseInput {
@@ -170,5 +191,16 @@ input UpdateShipmentInput {
   date: DateTime
 
   """id of the shipment"""
+  id: Int!
+}
+
+input CreateWarehouseProductInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateWarehouseProductInput {
+  """Example field (placeholder)"""
+  exampleField: Int
   id: Int!
 }

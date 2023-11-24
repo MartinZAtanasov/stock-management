@@ -7,6 +7,7 @@ import { WarehouseModule } from './warehouse/warehouse.module';
 import { ProductModule } from './product/product.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { SharedModule } from './shared/shared.module';
+import { WarehouseProductModule } from './warehouse-product/warehouse-product.module';
 
 @Module({
   imports: [
@@ -29,8 +30,7 @@ import { SharedModule } from './shared/shared.module';
     ProductModule,
     ShipmentModule,
     SharedModule,
+    WarehouseProductModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
