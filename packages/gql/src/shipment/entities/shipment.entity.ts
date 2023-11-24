@@ -39,8 +39,8 @@ export class Shipment {
   @ManyToOne(() => Warehouse, (warehouse) => warehouse.shipments, {
     onDelete: 'SET NULL',
   })
-  @Field(() => Warehouse, { description: 'warehouse' })
-  warehouse: Warehouse;
+  @Field(() => Warehouse, { description: 'warehouse', nullable: true })
+  warehouse?: Warehouse;
 
   @Field(() => ShipmentType, { description: 'shipment type' })
   @Column({
@@ -55,6 +55,6 @@ export class Shipment {
 
   @ManyToOne(() => Product, { onDelete: 'SET NULL' })
   @JoinColumn()
-  @Field(() => Product, { description: 'product' })
+  @Field(() => Product, { description: 'product', nullable: true })
   product: Product;
 }

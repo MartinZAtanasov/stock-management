@@ -1,6 +1,6 @@
 import { InputType, Int, Field, GraphQLISODateTime } from '@nestjs/graphql';
 import { ShipmentType } from '../entities/shipment.entity';
-import { IsDate, IsEnum, IsInt, IsPositive } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsPositive, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateShipmentInput {
@@ -23,6 +23,7 @@ export class CreateShipmentInput {
   @Field(() => ShipmentType, { description: 'shipment type' })
   type: ShipmentType;
 
+  @IsOptional()
   @IsDate()
   @Field(() => GraphQLISODateTime, {
     description: 'timestamp of the shipment',

@@ -24,7 +24,7 @@ type Shipment {
   date: DateTime!
 
   """warehouse"""
-  warehouse: Warehouse!
+  warehouse: Warehouse
 
   """shipment type"""
   type: ShipmentType!
@@ -33,7 +33,7 @@ type Shipment {
   quantity: Int!
 
   """product"""
-  product: Product!
+  product: Product
 }
 
 """
@@ -143,6 +143,9 @@ input CreateShipmentInput {
 
   """shipment type"""
   type: ShipmentType!
+
+  """timestamp of the shipment"""
+  date: DateTime
 }
 
 input UpdateShipmentInput {
