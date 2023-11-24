@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateShipmentInput } from './dto/create-shipment.input';
-import { UpdateShipmentInput } from './dto/update-shipment.input';
-import { Shipment } from './entities/shipment.entity';
+import { Shipment, ShipmentType } from './entities/shipment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { ImportExportService } from './import-export-service';
 
 @Injectable()
 export class ShipmentService {
@@ -16,6 +16,7 @@ export class ShipmentService {
     private warehouseRepository: Repository<Warehouse>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    private importExportService: ImportExportService,
   ) {}
 
   async create(input: CreateShipmentInput) {
@@ -33,14 +34,27 @@ export class ShipmentService {
       id: productId,
     });
 
-    const shipment = new Shipment();
-    shipment.warehouse = warehouse;
-    shipment.product = product;
+    if (createShipmentInput.type == ShipmentType.IMPORT) {
+      await this.importExportService.handleImportShipment(
+        input,
+        warehouse,
+        product,
+      );
+    } else {
+      await this.importExportService.handleExportShipment(
+        input,
+        warehouse,
+        product,
+      );
+    }
 
     const newShipment = this.shipmentRepository.create({
-      ...shipment,
+      ...new Shipment(),
+      warehouse,
+      product,
       ...createShipmentInput,
     });
+
     return this.shipmentRepository.save(newShipment);
   }
 
@@ -55,46 +69,5 @@ export class ShipmentService {
       where: { id },
       relations: { warehouse: true, product: true },
     });
-  }
-
-  async update(input: UpdateShipmentInput) {
-    const {
-      warehouse: warehouseId,
-      product: productId,
-      ...updateShipmentInput
-    } = input;
-
-    const shipment = await this.shipmentRepository.findOneOrFail({
-      where: { id: updateShipmentInput.id },
-      relations: { product: true, warehouse: true },
-    });
-
-    if (warehouseId) {
-      const warehouse = await this.warehouseRepository.findOneByOrFail({
-        id: warehouseId,
-      });
-      shipment.warehouse = warehouse;
-    }
-
-    if (productId) {
-      const product = await this.productRepository.findOneByOrFail({
-        id: productId,
-      });
-      shipment.product = product;
-    }
-
-    return this.shipmentRepository.save({
-      ...shipment,
-      ...updateShipmentInput,
-    });
-  }
-
-  async remove(id: number) {
-    const shipment = await this.shipmentRepository.findOneOrFail({
-      where: { id },
-      relations: { warehouse: true, product: true },
-    });
-    await this.shipmentRepository.delete({ id });
-    return shipment;
   }
 }

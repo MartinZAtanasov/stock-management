@@ -16,7 +16,7 @@ export class Product {
   @Field(() => Int, { description: 'size per unit' })
   size: number;
 
-  @Column('boolean')
+  @Column('boolean', { default: false })
   @Field(() => Boolean, { description: 'is product hazardous' })
   hazardous: boolean;
 }

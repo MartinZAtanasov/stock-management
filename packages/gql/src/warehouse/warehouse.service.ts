@@ -21,7 +21,12 @@ export class WarehouseService {
   }
 
   async findAll(): Promise<Warehouse[]> {
-    return this.warehouseRepository.find({ relations: { shipments: true } });
+    return this.warehouseRepository.find({
+      relations: {
+        shipments: true,
+        products: { product: true, warehouse: true },
+      },
+    });
   }
 
   findOne(id: number) {

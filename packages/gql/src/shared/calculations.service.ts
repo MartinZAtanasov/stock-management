@@ -33,6 +33,14 @@ export class CalculationsService {
     );
     const data = await res.json();
     if (!res.ok) throw new CustomHttpException(data, res.status, data.error);
-    return data as { result: { itemsSize: number } };
+    return (data?.result?.itemsSize || 0) as number;
+  }
+
+  async sum(numbers: number[]) {
+    return numbers.reduce((a, b) => a + b, 0);
+  }
+
+  async deduct(a: number, b: number) {
+    return a - b;
   }
 }

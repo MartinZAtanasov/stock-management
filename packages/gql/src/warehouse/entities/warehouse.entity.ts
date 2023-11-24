@@ -38,4 +38,8 @@ export class Warehouse {
     description: 'stocked products in the warehouse',
   })
   products: WarehouseProduct[];
+
+  @Column('boolean', { default: false })
+  @Field(() => Boolean, { description: 'is product hazardous' })
+  hazardous: boolean;
 }

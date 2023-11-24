@@ -81,6 +81,9 @@ type Warehouse {
 
   """stocked products in the warehouse"""
   products: [WarehouseProduct!]!
+
+  """is product hazardous"""
+  hazardous: Boolean!
 }
 
 type Query {
@@ -106,8 +109,6 @@ type Mutation {
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   removeProduct(id: Int!): Product!
   createShipment(createShipmentInput: CreateShipmentInput!): Shipment!
-  updateShipment(updateShipmentInput: UpdateShipmentInput!): Shipment!
-  removeShipment(id: Int!): Shipment!
   createWarehouseProduct(createWarehouseProductInput: CreateWarehouseProductInput!): WarehouseProduct!
   updateWarehouseProduct(updateWarehouseProductInput: UpdateWarehouseProductInput!): WarehouseProduct!
   removeWarehouseProduct(id: Int!): WarehouseProduct!
@@ -172,26 +173,6 @@ input CreateShipmentInput {
 
   """timestamp of the shipment"""
   date: DateTime
-}
-
-input UpdateShipmentInput {
-  """warehouse id"""
-  warehouse: Int
-
-  """product id"""
-  product: Int
-
-  """product quantity"""
-  quantity: Int
-
-  """shipment type"""
-  type: ShipmentType
-
-  """timestamp of the shipment"""
-  date: DateTime
-
-  """id of the shipment"""
-  id: Int!
 }
 
 input CreateWarehouseProductInput {
