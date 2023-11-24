@@ -26,36 +26,42 @@ export class ShipmentService {
       ...createShipmentInput
     } = input;
 
-    const warehouse = await this.warehouseRepository.findOneByOrFail({
-      id: warehouseId,
-    });
+    return this.shipmentRepository.manager.transaction(async (manager) => {
+      const shipmentRepository = manager.getRepository(Shipment);
 
-    const product = await this.productRepository.findOneByOrFail({
-      id: productId,
-    });
+      const warehouse = await this.warehouseRepository.findOneByOrFail({
+        id: warehouseId,
+      });
 
-    if (createShipmentInput.type == ShipmentType.IMPORT) {
-      await this.importExportService.handleImportShipment(
-        input,
+      const product = await this.productRepository.findOneByOrFail({
+        id: productId,
+      });
+
+      if (createShipmentInput.type == ShipmentType.IMPORT) {
+        await this.importExportService.handleImportShipment(
+          input,
+          warehouse,
+          product,
+          manager,
+        );
+      } else {
+        await this.importExportService.handleExportShipment(
+          input,
+          warehouse,
+          product,
+          manager,
+        );
+      }
+
+      const newShipment = shipmentRepository.create({
+        ...new Shipment(),
         warehouse,
         product,
-      );
-    } else {
-      await this.importExportService.handleExportShipment(
-        input,
-        warehouse,
-        product,
-      );
-    }
+        ...createShipmentInput,
+      });
 
-    const newShipment = this.shipmentRepository.create({
-      ...new Shipment(),
-      warehouse,
-      product,
-      ...createShipmentInput,
+      return shipmentRepository.save(newShipment);
     });
-
-    return this.shipmentRepository.save(newShipment);
   }
 
   findAll() {

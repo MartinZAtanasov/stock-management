@@ -3,26 +3,23 @@ import { CreateShipmentInput } from './dto/create-shipment.input';
 import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { WarehouseProduct } from 'src/warehouse-product/entities/warehouse-product.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { CalculationsService } from 'src/shared/calculations.service';
 import { CustomHttpException } from 'src/exceptions/custom-http.exception';
 
 @Injectable()
 export class ImportExportService {
-  constructor(
-    @InjectRepository(Warehouse)
-    private warehouseRepository: Repository<Warehouse>,
-    @InjectRepository(WarehouseProduct)
-    private warehouseProductRepository: Repository<WarehouseProduct>,
-    private calculationsService: CalculationsService,
-  ) {}
+  constructor(private calculationsService: CalculationsService) {}
 
   async handleImportShipment(
     createShipmentInput: CreateShipmentInput,
     warehouse: Warehouse,
     product: Product,
+    manager: EntityManager,
   ) {
+    const warehouseProductRepository = manager.getRepository(WarehouseProduct);
+    const warehouseRepository = manager.getRepository(Warehouse);
+
     if (
       warehouse?.products?.length &&
       warehouse.hazardous !== product.hazardous
@@ -48,12 +45,12 @@ export class ImportExportService {
       );
     }
 
-    let warehouseProduct = await this.warehouseProductRepository.findOne({
+    let warehouseProduct = await warehouseProductRepository.findOne({
       where: { warehouse: { id: warehouse.id }, product: { id: product.id } },
     });
 
     if (!warehouseProduct) {
-      warehouseProduct = this.warehouseProductRepository.create({
+      warehouseProduct = warehouseProductRepository.create({
         ...new WarehouseProduct(),
         quantity: createShipmentInput.quantity,
         product,
@@ -76,20 +73,23 @@ export class ImportExportService {
       productSize,
     ]);
 
-    await this.warehouseRepository.save(warehouse);
+    await warehouseRepository.save(warehouse);
 
-    return this.warehouseProductRepository.save(warehouseProduct);
+    return warehouseProductRepository.save(warehouseProduct);
   }
 
   async handleExportShipment(
     createShipmentInput: CreateShipmentInput,
     warehouse: Warehouse,
     product: Product,
+    manager: EntityManager,
   ) {
-    const warehouseProduct =
-      await this.warehouseProductRepository.findOneOrFail({
-        where: { warehouse: { id: warehouse.id }, product: { id: product.id } },
-      });
+    const warehouseProductRepository = manager.getRepository(WarehouseProduct);
+    const warehouseRepository = manager.getRepository(Warehouse);
+
+    const warehouseProduct = await warehouseProductRepository.findOneOrFail({
+      where: { warehouse: { id: warehouse.id }, product: { id: product.id } },
+    });
 
     if (warehouseProduct.quantity < createShipmentInput.quantity) {
       throw new CustomHttpException(
@@ -123,13 +123,13 @@ export class ImportExportService {
     if (!warehouseProduct.quantity) {
       warehouse.hazardous = false;
 
-      await this.warehouseProductRepository.delete({
+      await warehouseProductRepository.delete({
         id: warehouseProduct.id,
       });
     } else {
-      await this.warehouseProductRepository.save(warehouseProduct);
+      await warehouseProductRepository.save(warehouseProduct);
     }
 
-    return this.warehouseRepository.save(warehouse);
+    return warehouseRepository.save(warehouse);
   }
 }
