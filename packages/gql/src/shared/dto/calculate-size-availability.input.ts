@@ -1,6 +1,6 @@
-import { ItemDto } from './item';
+import { ItemInput } from './item';
 
-export class CalculateSizeAvailabilityDto {
+export class CalculateSizeAvailabilityInput {
   size: number;
-  items: ItemDto[];
+  items: ItemInput[];
 }

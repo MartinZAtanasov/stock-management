@@ -6,9 +6,9 @@ import {
   IsPositive,
   ValidateNested,
 } from 'class-validator';
-import { ItemDto } from './item';
+import { ItemInput } from './item';
 
-export class CalculateSizeAvailabilityDto {
+export class CalculateSizeAvailabilityInput {
   @IsInt()
   @IsPositive()
   size: number;
@@ -16,6 +16,6 @@ export class CalculateSizeAvailabilityDto {
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  @Type(() => ItemDto)
-  items: ItemDto[];
+  @Type(() => ItemInput)
+  items: ItemInput[];
 }

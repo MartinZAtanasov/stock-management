@@ -1,11 +1,11 @@
 import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, ValidateNested } from 'class-validator';
-import { ItemDto } from './item';
+import { ItemInput } from './item';
 
-export class CalculateItemsSizeDto {
+export class CalculateItemsSizeInput {
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  @Type(() => ItemDto)
-  items: ItemDto[];
+  @Type(() => ItemInput)
+  items: ItemInput[];
 }

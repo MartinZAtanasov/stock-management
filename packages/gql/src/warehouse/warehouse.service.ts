@@ -21,10 +21,6 @@ export class WarehouseService {
   }
 
   async findAll(): Promise<Warehouse[]> {
-    const res = await this.calculationsService.calculateItemsSize({
-      items: [{ quantity: 1, sizePerUnit: 1 }],
-    });
-    console.log({ res });
     return this.warehouseRepository.find({ relations: { shipments: true } });
   }
 

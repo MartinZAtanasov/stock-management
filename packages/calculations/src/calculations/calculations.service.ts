@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CalculateSizeAvailabilityDto } from './dto/calculate-size-availability.input';
-import { CalculateItemsSizeDto } from './dto/calculate-items-size.input';
+import { CalculateSizeAvailabilityInput } from './dto/calculate-size-availability.input';
+import { CalculateItemsSizeInput } from './dto/calculate-items-size.input';
 
 @Injectable()
 export class CalculationsService {
-  calculateSizeAvailability({ items, size }: CalculateSizeAvailabilityDto) {
+  calculateSizeAvailability({ items, size }: CalculateSizeAvailabilityInput) {
     const itemsSize = items.reduce((acc, current) => {
       const itemSize = current.quantity * current.sizePerUnit;
       return acc + itemSize;
@@ -20,7 +20,7 @@ export class CalculationsService {
     };
   }
 
-  calculateItemsSize({ items }: CalculateItemsSizeDto) {
+  calculateItemsSize({ items }: CalculateItemsSizeInput) {
     const itemsSize = items.reduce((acc, current) => {
       const itemSize = current.quantity * current.sizePerUnit;
       return acc + itemSize;

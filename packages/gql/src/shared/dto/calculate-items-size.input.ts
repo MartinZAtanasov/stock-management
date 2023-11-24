@@ -1,5 +1,5 @@
-import { ItemDto } from './item';
+import { ItemInput } from './item';
 
-export class CalculateItemsSizeDto {
-  items: ItemDto[];
+export class CalculateItemsSizeInput {
+  items: ItemInput[];
 }
