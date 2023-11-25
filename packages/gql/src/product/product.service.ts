@@ -7,7 +7,13 @@ import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { ProductsFilterInput } from './dto/products-filter-input';
 import { WarehouseProduct } from 'src/warehouse-product/entities/warehouse-product.entity';
 import { ProductEventHandlerService } from './product-event-handler.service';
@@ -27,7 +33,31 @@ export class ProductService {
   }
 
   findAll(productsFilterInput: ProductsFilterInput) {
-    return this.productRepository.find({ where: productsFilterInput });
+    const { hazardous, maxSize, minSize } = productsFilterInput || {};
+
+    const sizeFilter: FindOperator<number> | undefined = (() => {
+      if (maxSize == undefined && minSize == undefined) {
+        return undefined;
+      }
+
+      if (maxSize < minSize) {
+        throw new UserInputError('maxSize cannot be less than minSize');
+      }
+
+      if (maxSize && minSize == undefined) {
+        return LessThanOrEqual(maxSize);
+      }
+
+      if (minSize && maxSize == undefined) {
+        return MoreThanOrEqual(minSize);
+      }
+
+      return Between(minSize, maxSize);
+    })();
+
+    return this.productRepository.find({
+      where: { hazardous, size: sizeFilter },
+    });
   }
 
   findOne(id: number) {

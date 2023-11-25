@@ -98,6 +98,12 @@ type Query {
 input ProductsFilterInput {
   """is product hazardous"""
   hazardous: Boolean
+
+  """size per unit"""
+  maxSize: Int
+
+  """size per unit"""
+  minSize: Int
 }
 
 type Mutation {
