@@ -87,7 +87,7 @@ type Warehouse {
 }
 
 type Query {
-  warehouses: [Warehouse!]!
+  warehouses(warehousesFilterInput: WarehousesFilterInput): [Warehouse!]!
   warehouse(id: Int!): Warehouse!
   products(productsFilterInput: ProductsFilterInput): [Product!]!
   product(id: Int!): Product!
@@ -95,14 +95,31 @@ type Query {
   shipment(id: Int!): Shipment!
 }
 
+input WarehousesFilterInput {
+  """is warehouse hazardous"""
+  hazardous: Boolean
+
+  """size per unit"""
+  minAvailableSize: Int
+
+  """warehouse has product"""
+  productId: Int
+
+  """warehouse max size"""
+  maxSize: Int
+
+  """warehouse min size"""
+  minSize: Int
+}
+
 input ProductsFilterInput {
   """is product hazardous"""
   hazardous: Boolean
 
-  """size per unit"""
+  """max size per unit"""
   maxSize: Int
 
-  """size per unit"""
+  """min size per unit"""
   minSize: Int
 }
 

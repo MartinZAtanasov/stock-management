@@ -32,7 +32,7 @@ export class ProductService {
     return this.productRepository.save(newProduct);
   }
 
-  findAll(productsFilterInput: ProductsFilterInput) {
+  findAll(productsFilterInput?: ProductsFilterInput) {
     const { hazardous, maxSize, minSize } = productsFilterInput || {};
 
     const sizeFilter: FindOperator<number> | undefined = (() => {

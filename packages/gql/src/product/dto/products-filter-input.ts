@@ -10,11 +10,11 @@ export class ProductsFilterInput {
 
   @IsOptional()
   @IsPositive()
-  @Field(() => Int, { description: 'size per unit', nullable: true })
+  @Field(() => Int, { description: 'max size per unit', nullable: true })
   maxSize: number;
 
   @IsOptional()
   @IsPositive()
-  @Field(() => Int, { description: 'size per unit', nullable: true })
+  @Field(() => Int, { description: 'min size per unit', nullable: true })
   minSize: number;
 }
