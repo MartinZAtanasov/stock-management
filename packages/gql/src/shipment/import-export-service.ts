@@ -5,7 +5,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { WarehouseProduct } from 'src/warehouse-product/entities/warehouse-product.entity';
 import { EntityManager } from 'typeorm';
 import { CalculationsService } from 'src/shared/calculations.service';
-import { CustomHttpException } from 'src/exceptions/custom-http.exception';
+import { UserInputError } from '@nestjs/apollo';
 
 @Injectable()
 export class ImportExportService {
@@ -22,12 +22,21 @@ export class ImportExportService {
 
     if (
       warehouse?.products?.length &&
-      warehouse.hazardous !== product.hazardous
+      warehouse.hazardous != product.hazardous
     ) {
-      throw new CustomHttpException(
-        null,
-        HttpStatus.CONFLICT,
-        'Cannot mix hazardous and non hazardous products in the warehouse',
+      throw new UserInputError(
+        'Cannot mix hazardous and non hazardous products',
+        {
+          extensions: {
+            code: HttpStatus.BAD_REQUEST,
+            errors: [
+              {
+                data: { warehouseId: warehouse.id },
+                code: HttpStatus.BAD_REQUEST,
+              },
+            ],
+          },
+        },
       );
     }
 
@@ -38,10 +47,23 @@ export class ImportExportService {
     });
 
     if (productSize > warehouse.availableSize) {
-      throw new CustomHttpException(
-        null,
-        HttpStatus.CONFLICT,
-        'Not enough available size in the warehouse',
+      throw new UserInputError(
+        'The Warehouse does not have enough available size',
+        {
+          extensions: {
+            code: HttpStatus.BAD_REQUEST,
+            errors: [
+              {
+                data: {
+                  warehouseId: warehouse.id,
+                  productSize,
+                  warehouseAvailableSize: warehouse.availableSize,
+                },
+                code: HttpStatus.BAD_REQUEST,
+              },
+            ],
+          },
+        },
       );
     }
 
@@ -92,10 +114,23 @@ export class ImportExportService {
     });
 
     if (warehouseProduct.quantity < createShipmentInput.quantity) {
-      throw new CustomHttpException(
-        null,
-        HttpStatus.CONFLICT,
+      throw new UserInputError(
         'Export quantity is more than the warehouse product quantity',
+        {
+          extensions: {
+            code: HttpStatus.BAD_REQUEST,
+            errors: [
+              {
+                data: {
+                  warehouseId: warehouse.id,
+                  warehouseProductQuantity: warehouseProduct.quantity,
+                  exportProductQuantity: createShipmentInput.quantity,
+                },
+                code: HttpStatus.BAD_REQUEST,
+              },
+            ],
+          },
+        },
       );
     }
 
@@ -120,9 +155,11 @@ export class ImportExportService {
       productSize,
     );
 
-    if (!warehouseProduct.quantity) {
+    if (warehouse.availableSize == warehouse.size) {
       warehouse.hazardous = false;
+    }
 
+    if (!warehouseProduct.quantity) {
       await warehouseProductRepository.delete({
         id: warehouseProduct.id,
       });

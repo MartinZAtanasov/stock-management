@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CalculateSizeAvailabilityInput } from './dto/calculate-size-availability.input';
 import { CalculateItemsSizeInput } from './dto/calculate-items-size.input';
-import { CustomHttpException } from 'src/exceptions/custom-http.exception';
 
 const baseURL = 'http://localhost:3001/calculations';
 
@@ -22,7 +21,7 @@ export class CalculationsService {
       JSON.stringify(payload),
     );
     const data = await res.json();
-    if (!res.ok) throw new CustomHttpException(data, res.status, data.error);
+    if (!res.ok) throw new InternalServerErrorException();
     return data as { result: { availableSize: number; takenSize: number } };
   }
 
@@ -32,7 +31,7 @@ export class CalculationsService {
       JSON.stringify({ items: payload.items }),
     );
     const data = await res.json();
-    if (!res.ok) throw new CustomHttpException(data, res.status, data.error);
+    if (!res.ok) throw new InternalServerErrorException();
     return (data?.result?.itemsSize || 0) as number;
   }
 

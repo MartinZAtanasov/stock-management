@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { Product } from './entities/product.entity';
@@ -7,6 +11,7 @@ import { Repository } from 'typeorm';
 import { ProductsFilterInput } from './dto/products-filter-input';
 import { WarehouseProduct } from 'src/warehouse-product/entities/warehouse-product.entity';
 import { ProductEventHandlerService } from './product-event-handler.service';
+import { UserInputError } from '@nestjs/apollo';
 
 @Injectable()
 export class ProductService {
@@ -56,17 +61,23 @@ export class ProductService {
       );
 
       const errors = promisesResults.filter((v) => v.status == 'rejected');
-
       if (errors.length) {
-        throw new InternalServerErrorException(
-          errors.map((err: any) => err?.reason).join('; '),
-        );
+        throw new UserInputError('Something went wrong', {
+          extensions: {
+            code: HttpStatus.BAD_REQUEST,
+            errors: errors.map((e: any) => ({
+              ...e?.reason,
+              ...e?.reason?.response,
+              response: undefined,
+              code: HttpStatus.BAD_REQUEST,
+            })),
+          },
+        });
       }
       return productRepository.save({ ...product, ...updateProductInput });
     });
   }
 
-  // TODO: Custom error codes
   async remove(id: number) {
     const product = await this.productRepository.findOneOrFail({
       where: { id },
@@ -91,8 +102,8 @@ export class ProductService {
         ),
       );
 
-      const err = promisesResults.find((v) => v.status == 'rejected');
-      if (err) throw new InternalServerErrorException(err);
+      const error: any = promisesResults.find((v) => v.status == 'rejected');
+      if (error) throw new InternalServerErrorException(error?.reason?.message);
 
       await productRepository.delete({ id });
       return product;

@@ -29,8 +29,9 @@ export class ShipmentService {
     return this.shipmentRepository.manager.transaction(async (manager) => {
       const shipmentRepository = manager.getRepository(Shipment);
 
-      const warehouse = await this.warehouseRepository.findOneByOrFail({
-        id: warehouseId,
+      const warehouse = await this.warehouseRepository.findOneOrFail({
+        where: { id: warehouseId },
+        relations: { products: true },
       });
 
       const product = await this.productRepository.findOneByOrFail({

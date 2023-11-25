@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CalculationsService } from 'src/shared/calculations.service';
 import { WarehouseProduct } from 'src/warehouse-product/entities/warehouse-product.entity';
 import { EntityManager } from 'typeorm';
@@ -58,21 +58,23 @@ export class ProductEventHandlerService {
     manager: EntityManager,
   ) {
     const warehouseRepository = manager.getRepository(Warehouse);
-    const warehouse = warehouseProduct.warehouse;
+
+    const warehouse = await warehouseRepository.findOneBy({
+      id: warehouseProduct.warehouse.id,
+    });
 
     const isHazardousChange =
       updateProductInput.hazardous !== undefined &&
       product.hazardous != updateProductInput.hazardous;
 
     if (isHazardousChange) {
-      if (warehouse.products.length == 1) {
-        warehouse.hazardous == updateProductInput.hazardous;
-      }
-      if (warehouse.hazardous != updateProductInput.hazardous) {
-        throw new Error(
-          'Cannot mix hazardous and non hazardous products for warehouse ' +
-            warehouse.id,
-        );
+      if (warehouseProduct.warehouse.products.length == 1) {
+        warehouse.hazardous = updateProductInput.hazardous;
+      } else if (warehouse.hazardous != updateProductInput.hazardous) {
+        throw new BadRequestException({
+          message: 'Cannot mix hazardous and non hazardous products',
+          data: { warehouseId: warehouse.id },
+        });
       }
     }
 
@@ -80,7 +82,7 @@ export class ProductEventHandlerService {
       updateProductInput.size == undefined ||
       product.size == updateProductInput.size;
 
-    if (noSizeChange) return;
+    if (noSizeChange) return warehouseRepository.save(warehouse);
 
     const isIncreasedSize = product.size < updateProductInput.size;
 
@@ -101,7 +103,14 @@ export class ProductEventHandlerService {
         });
 
       if (extraProductSize > warehouse.availableSize) {
-        throw new Error(`Warehouse ${warehouse.id} doesn't have enough size`);
+        throw new BadRequestException({
+          message: 'Warehouse does not have enough size',
+          data: {
+            warehouseId: warehouse.id,
+            extraProductSize,
+            availableSize: warehouse.availableSize,
+          },
+        });
       }
 
       warehouse.availableSize = await this.calculationsService.deduct(
@@ -140,6 +149,7 @@ export class ProductEventHandlerService {
         lessProductSize,
       );
     }
-    await warehouseRepository.save(warehouse);
+
+    return warehouseRepository.save(warehouse);
   }
 }
