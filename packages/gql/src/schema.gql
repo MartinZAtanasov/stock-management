@@ -93,7 +93,6 @@ type Query {
   product(id: Int!): Product!
   shipments: [Shipment!]!
   shipment(id: Int!): Shipment!
-  warehouseProduct(id: Int!): WarehouseProduct!
 }
 
 input ProductsFilterInput {
@@ -106,9 +105,6 @@ type Mutation {
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   removeProduct(id: Int!): Product!
   createShipment(createShipmentInput: CreateShipmentInput!): Shipment!
-  createWarehouseProduct(createWarehouseProductInput: CreateWarehouseProductInput!): WarehouseProduct!
-  updateWarehouseProduct(updateWarehouseProductInput: UpdateWarehouseProductInput!): WarehouseProduct!
-  removeWarehouseProduct(id: Int!): WarehouseProduct!
 }
 
 input CreateProductInput {
@@ -151,15 +147,4 @@ input CreateShipmentInput {
 
   """timestamp of the shipment"""
   date: DateTime
-}
-
-input CreateWarehouseProductInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateWarehouseProductInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
