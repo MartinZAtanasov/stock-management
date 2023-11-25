@@ -35,9 +35,122 @@ export class ProductService {
     const product = await this.productRepository.findOneByOrFail({
       id: updateProductInput.id,
     });
-    return this.productRepository.save({ ...product, ...updateProductInput });
+
+    return this.productRepository.manager.transaction(async (manager) => {
+      const productRepository = manager.getRepository(Product);
+      const warehouseRepository = manager.getRepository(Warehouse);
+      const warehouseProductRepository =
+        manager.getRepository(WarehouseProduct);
+
+      const warehouseProducts = await warehouseProductRepository.find({
+        where: { product: { id: product.id } },
+        relations: { warehouse: { products: true } },
+      });
+
+      const promisesResults = await Promise.allSettled(
+        warehouseProducts.map(async (warehouseProduct) => {
+          const warehouse = warehouseProduct.warehouse;
+
+          // Hazardous validation
+          const isHazardousChange =
+            updateProductInput.hazardous !== undefined &&
+            product.hazardous != updateProductInput.hazardous;
+
+          if (isHazardousChange) {
+            if (warehouse.products.length == 1) {
+              warehouse.hazardous == updateProductInput.hazardous;
+            }
+            if (warehouse.hazardous != updateProductInput.hazardous) {
+              throw new Error(
+                'Cannot mix hazardous and non hazardous products for warehouse ' +
+                  warehouse.id,
+              );
+            }
+          }
+
+          const noSizeChange =
+            updateProductInput.size == undefined ||
+            product.size == updateProductInput.size;
+
+          if (noSizeChange) return;
+
+          // Size validation
+          const isIncreasedSize = product.size < updateProductInput.size;
+
+          if (isIncreasedSize) {
+            const extraSize = await this.calculationsService.deduct(
+              updateProductInput.size,
+              product.size,
+            );
+
+            const extraProductSize =
+              await this.calculationsService.calculateItemsSize({
+                items: [
+                  {
+                    quantity: warehouseProduct.quantity,
+                    sizePerUnit: extraSize,
+                  },
+                ],
+              });
+
+            if (extraProductSize > warehouse.availableSize) {
+              throw new Error(
+                `Warehouse ${warehouse.id} doesn't have enough size`,
+              );
+            }
+
+            warehouse.availableSize = await this.calculationsService.deduct(
+              warehouse.availableSize,
+              extraProductSize,
+            );
+
+            warehouse.takenSize = await this.calculationsService.sum([
+              warehouse.takenSize,
+              extraProductSize,
+            ]);
+          } else {
+            const lessSize = await this.calculationsService.deduct(
+              product.size,
+              updateProductInput.size,
+            );
+
+            const lessProductSize =
+              await this.calculationsService.calculateItemsSize({
+                items: [
+                  {
+                    quantity: warehouseProduct.quantity,
+                    sizePerUnit: lessSize,
+                  },
+                ],
+              });
+
+            warehouse.availableSize = await this.calculationsService.sum([
+              warehouse.availableSize,
+              lessProductSize,
+            ]);
+
+            warehouse.takenSize = await this.calculationsService.deduct(
+              warehouse.takenSize,
+              lessProductSize,
+            );
+          }
+          await warehouseRepository.save(warehouse);
+        }),
+      );
+
+      const errors = promisesResults.filter((v) => v.status == 'rejected');
+
+      if (errors.length) {
+        throw new InternalServerErrorException(
+          errors.map((err: any) => err?.reason).join('; '),
+        );
+      }
+      return productRepository.save({ ...product, ...updateProductInput });
+    });
   }
 
+  // TODO: Extract into another service
+  // TODO: Custom error codes
   async remove(id: number) {
     const product = await this.productRepository.findOneOrFail({
       where: { id },
@@ -50,7 +163,7 @@ export class ProductService {
 
       const warehouseProducts = await warehouseProductRepository.find({
         where: { product: { id: id } },
-        relations: { warehouse: true },
+        relations: { warehouse: { products: true } },
       });
 
       const promisesResults = await Promise.allSettled(
@@ -70,7 +183,9 @@ export class ProductService {
 
           await warehouseProductRepository.delete({ id: warehouseProduct.id });
 
-          if (productSize == warehouse.takenSize) {
+          const isOnlyProduct = warehouse.products?.length == 1;
+
+          if (isOnlyProduct) {
             warehouse.hazardous = false;
             warehouse.takenSize = 0;
             warehouse.availableSize = warehouse.size;
