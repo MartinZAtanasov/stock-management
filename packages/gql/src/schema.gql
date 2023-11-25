@@ -102,9 +102,6 @@ input ProductsFilterInput {
 }
 
 type Mutation {
-  createWarehouse(createWarehouseInput: CreateWarehouseInput!): Warehouse!
-  updateWarehouse(updateWarehouseInput: UpdateWarehouseInput!): Warehouse!
-  removeWarehouse(id: Int!): Warehouse!
   createProduct(createProductInput: CreateProductInput!): Product!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   removeProduct(id: Int!): Product!
@@ -112,25 +109,6 @@ type Mutation {
   createWarehouseProduct(createWarehouseProductInput: CreateWarehouseProductInput!): WarehouseProduct!
   updateWarehouseProduct(updateWarehouseProductInput: UpdateWarehouseProductInput!): WarehouseProduct!
   removeWarehouseProduct(id: Int!): WarehouseProduct!
-}
-
-input CreateWarehouseInput {
-  """name of the warehouse"""
-  name: String!
-
-  """size of the warehouse"""
-  size: Int!
-}
-
-input UpdateWarehouseInput {
-  """name of the warehouse"""
-  name: String
-
-  """size of the warehouse"""
-  size: Int
-
-  """id of the warehouse"""
-  id: Int!
 }
 
 input CreateProductInput {

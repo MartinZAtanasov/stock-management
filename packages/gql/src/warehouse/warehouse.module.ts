@@ -3,10 +3,9 @@ import { WarehouseService } from './warehouse.service';
 import { WarehouseResolver } from './warehouse.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Warehouse } from './entities/warehouse.entity';
-import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Warehouse]), SharedModule],
+  imports: [TypeOrmModule.forFeature([Warehouse])],
   providers: [WarehouseResolver, WarehouseService],
 })
 export class WarehouseModule {}
