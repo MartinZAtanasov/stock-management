@@ -12,14 +12,14 @@ export default class WarehouseSeeder implements Seeder {
         size: 10,
         availableSize: 10,
         takenSize: 0,
-        hazardous: true,
+        hazardous: false,
       },
       {
         name: 'W 2',
         size: 20,
-        availableSize: 10,
+        availableSize: 20,
         takenSize: 0,
-        hazardous: true,
+        hazardous: false,
       },
     ]);
   }
