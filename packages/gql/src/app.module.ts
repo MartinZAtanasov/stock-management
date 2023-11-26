@@ -8,9 +8,11 @@ import { ProductModule } from './product/product.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { SharedModule } from './shared/shared.module';
 import { WarehouseProductModule } from './warehouse-product/warehouse-product.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ envFilePath: ['.env', '../../.env'] }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -19,11 +21,11 @@ import { WarehouseProductModule } from './warehouse-product/warehouse-product.mo
     TypeOrmModule.forRoot({
       autoLoadEntities: true,
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'root',
-      password: 'root',
-      database: 'test',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       synchronize: true,
     }),
     WarehouseModule,

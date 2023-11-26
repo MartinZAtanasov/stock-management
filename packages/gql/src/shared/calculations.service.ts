@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CalculateItemsSizeInput } from './dto/calculate-items-size.input';
 
-const baseURL = 'http://localhost:3001/calculations';
+const baseURL = process.env.CALCULATIONS_API_BASE_URL;
 
 const fetcher = (path: string, body: string, method = 'POST') =>
   fetch(baseURL + path, {
