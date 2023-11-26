@@ -37,14 +37,15 @@ export class ShipmentService {
     return this.shipmentRepository.manager.transaction(async (manager) => {
       const shipmentRepository = manager.getRepository(Shipment);
 
-      const warehouse = await this.warehouseRepository.findOneOrFail({
-        where: { id: warehouseId },
-        relations: { products: true },
-      });
-
-      const product = await this.productRepository.findOneByOrFail({
-        id: productId,
-      });
+      const [warehouse, product] = await Promise.all([
+        this.warehouseRepository.findOneOrFail({
+          where: { id: warehouseId },
+          relations: { products: true },
+        }),
+        this.productRepository.findOneByOrFail({
+          id: productId,
+        }),
+      ]);
 
       if (createShipmentInput.type == ShipmentType.IMPORT) {
         await this.importExportService.handleImportShipment(

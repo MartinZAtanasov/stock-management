@@ -85,15 +85,14 @@ export class ImportExportService {
       ]);
     }
 
-    warehouse.hazardous = product.hazardous;
-    warehouse.availableSize = await this.calculationsService.deduct(
-      warehouse.availableSize,
-      productSize,
-    );
-    warehouse.takenSize = await this.calculationsService.sum([
-      warehouse.takenSize,
-      productSize,
+    const [availableSize, takenSize] = await Promise.all([
+      this.calculationsService.deduct(warehouse.availableSize, productSize),
+      this.calculationsService.sum([warehouse.takenSize, productSize]),
     ]);
+
+    warehouse.hazardous = product.hazardous;
+    warehouse.availableSize = availableSize;
+    warehouse.takenSize = takenSize;
 
     await warehouseRepository.save(warehouse);
 
@@ -134,26 +133,27 @@ export class ImportExportService {
       );
     }
 
-    warehouseProduct.quantity = await this.calculationsService.deduct(
-      warehouseProduct.quantity,
-      createShipmentInput.quantity,
-    );
-
-    const productSize = await this.calculationsService.calculateItemsSize({
-      items: [
-        { quantity: createShipmentInput.quantity, sizePerUnit: product.size },
-      ],
-    });
-
-    warehouse.availableSize = await this.calculationsService.sum([
-      warehouse.availableSize,
-      productSize,
+    const [quantity, productSize] = await Promise.all([
+      this.calculationsService.deduct(
+        warehouseProduct.quantity,
+        createShipmentInput.quantity,
+      ),
+      this.calculationsService.calculateItemsSize({
+        items: [
+          { quantity: createShipmentInput.quantity, sizePerUnit: product.size },
+        ],
+      }),
     ]);
 
-    warehouse.takenSize = await this.calculationsService.deduct(
-      warehouse.takenSize,
-      productSize,
-    );
+    warehouseProduct.quantity = quantity;
+
+    const [availableSize, takenSize] = await Promise.all([
+      this.calculationsService.sum([warehouse.availableSize, productSize]),
+      this.calculationsService.deduct(warehouse.takenSize, productSize),
+    ]);
+
+    warehouse.availableSize = availableSize;
+    warehouse.takenSize = takenSize;
 
     if (warehouse.availableSize == warehouse.size) {
       warehouse.hazardous = false;

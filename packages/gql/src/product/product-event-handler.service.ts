@@ -20,16 +20,17 @@ export class ProductEventHandlerService {
 
     const warehouse = warehouseProduct.warehouse;
 
-    const productSize = await this.calculationsService.calculateItemsSize({
-      items: [
-        {
-          quantity: warehouseProduct.quantity,
-          sizePerUnit: product.size,
-        },
-      ],
-    });
-
-    await warehouseProductRepository.delete({ id: warehouseProduct.id });
+    const [productSize] = await Promise.all([
+      this.calculationsService.calculateItemsSize({
+        items: [
+          {
+            quantity: warehouseProduct.quantity,
+            sizePerUnit: product.size,
+          },
+        ],
+      }),
+      warehouseProductRepository.delete({ id: warehouseProduct.id }),
+    ]);
 
     const isOnlyProduct = warehouse.products?.length == 1;
 
@@ -38,14 +39,12 @@ export class ProductEventHandlerService {
       warehouse.takenSize = 0;
       warehouse.availableSize = warehouse.size;
     } else {
-      warehouse.takenSize = await this.calculationsService.deduct(
-        warehouse.takenSize,
-        productSize,
-      );
-      warehouse.availableSize = await this.calculationsService.sum([
-        warehouse.availableSize,
-        productSize,
+      const [takenSize, availableSize] = await Promise.all([
+        this.calculationsService.deduct(warehouse.takenSize, productSize),
+        this.calculationsService.sum([warehouse.availableSize, productSize]),
       ]);
+      warehouse.takenSize = takenSize;
+      warehouse.availableSize = availableSize;
     }
 
     await warehouseRepository.save(warehouse);
@@ -113,15 +112,16 @@ export class ProductEventHandlerService {
         });
       }
 
-      warehouse.availableSize = await this.calculationsService.deduct(
-        warehouse.availableSize,
-        extraProductSize,
-      );
-
-      warehouse.takenSize = await this.calculationsService.sum([
-        warehouse.takenSize,
-        extraProductSize,
+      const [availableSize, takenSize] = await Promise.all([
+        this.calculationsService.deduct(
+          warehouse.availableSize,
+          extraProductSize,
+        ),
+        this.calculationsService.sum([warehouse.takenSize, extraProductSize]),
       ]);
+
+      warehouse.availableSize = availableSize;
+      warehouse.takenSize = takenSize;
     } else {
       const lessSize = await this.calculationsService.deduct(
         product.size,
@@ -139,15 +139,16 @@ export class ProductEventHandlerService {
         },
       );
 
-      warehouse.availableSize = await this.calculationsService.sum([
-        warehouse.availableSize,
-        lessProductSize,
+      const [availableSize, takenSize] = await Promise.all([
+        this.calculationsService.sum([
+          warehouse.availableSize,
+          lessProductSize,
+        ]),
+        this.calculationsService.deduct(warehouse.takenSize, lessProductSize),
       ]);
 
-      warehouse.takenSize = await this.calculationsService.deduct(
-        warehouse.takenSize,
-        lessProductSize,
-      );
+      warehouse.availableSize = availableSize;
+      warehouse.takenSize = takenSize;
     }
 
     return warehouseRepository.save(warehouse);
