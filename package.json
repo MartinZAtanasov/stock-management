@@ -17,7 +17,7 @@
     "lerna": "^7.4.2"
   },
   "scripts": {
-    "start:dev": "lerna run start:dev --parallel",
+    "start:dev": "lerna run start:dev --parallel --stream",
     "seed": "lerna run seed --scope=gql"
   }
 }
