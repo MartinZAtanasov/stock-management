@@ -2,10 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateShipmentInput } from './dto/create-shipment.input';
 import { Shipment, ShipmentType } from './entities/shipment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { ImportExportService } from './import-export-service';
+import { ShipmentsFilterInput } from './dto/shipments-filters.input';
 
 @Injectable()
 export class ShipmentService {
@@ -65,8 +72,24 @@ export class ShipmentService {
     });
   }
 
-  findAll() {
+  findAll(shipmentsFilterInput: ShipmentsFilterInput) {
+    const { dateFrom, dateTo, warehouseId, productId, hazardous, type } =
+      shipmentsFilterInput || {};
+
+    const dateFilter: FindOperator<Date> = (() => {
+      if (dateFrom == undefined && dateTo == undefined) return undefined;
+      if (dateFrom && dateTo == undefined) return MoreThanOrEqual(dateFrom);
+      if (dateTo && dateFrom == undefined) return LessThanOrEqual(dateTo);
+      return Between(dateFrom, dateTo);
+    })();
+
     return this.shipmentRepository.find({
+      where: {
+        warehouse: { id: warehouseId },
+        date: dateFilter,
+        product: { id: productId, hazardous },
+        type,
+      },
       relations: { warehouse: true, product: true },
     });
   }

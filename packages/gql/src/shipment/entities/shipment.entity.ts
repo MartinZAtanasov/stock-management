@@ -5,6 +5,7 @@ import {
   GraphQLISODateTime,
   registerEnumType,
 } from '@nestjs/graphql';
+import { IsDateString, IsOptional } from 'class-validator';
 import { Product } from 'src/product/entities/product.entity';
 import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import {
@@ -32,6 +33,8 @@ export class Shipment {
   @Field(() => Int, { description: 'id of the shipment' })
   id: number;
 
+  @IsDateString()
+  @IsOptional()
   @Field(() => GraphQLISODateTime, { description: 'timestamp of the shipment' })
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   date: Date;

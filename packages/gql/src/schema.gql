@@ -91,7 +91,7 @@ type Query {
   warehouse(id: Int!): Warehouse!
   products(productsFilterInput: ProductsFilterInput): [Product!]!
   product(id: Int!): Product!
-  shipments: [Shipment!]!
+  shipments(shipmentsFilterInput: ShipmentsFilterInput): [Shipment!]!
   shipment(id: Int!): Shipment!
 }
 
@@ -121,6 +121,26 @@ input ProductsFilterInput {
 
   """min size per unit"""
   minSize: Int
+}
+
+input ShipmentsFilterInput {
+  """from date shipments"""
+  dateFrom: DateTime
+
+  """to date shipments"""
+  dateTo: DateTime
+
+  """the warehouse of the shipment"""
+  warehouseId: Int
+
+  """the product of the shipment"""
+  productId: Int
+
+  """shipment has hazardous product"""
+  hazardous: Boolean
+
+  """shipment type"""
+  type: ShipmentType
 }
 
 type Mutation {
