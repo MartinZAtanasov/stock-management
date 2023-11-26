@@ -91,7 +91,7 @@ type Query {
   warehouse(id: Int!): Warehouse!
   products(productsFilterInput: ProductsFilterInput): [Product!]!
   product(id: Int!): Product!
-  shipments(shipmentsFilterInput: ShipmentsFilterInput): [Shipment!]!
+  shipments(shipmentsFilterInput: ShipmentsFilterInput, shipmentsOrderInput: ShipmentsOrderInput): [Shipment!]!
   shipment(id: Int!): Shipment!
 }
 
@@ -141,6 +141,16 @@ input ShipmentsFilterInput {
 
   """shipment type"""
   type: ShipmentType
+}
+
+input ShipmentsOrderInput {
+  """order by date"""
+  date: OrderDirection
+}
+
+enum OrderDirection {
+  ASC
+  DESC
 }
 
 type Mutation {

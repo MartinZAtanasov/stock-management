@@ -13,6 +13,7 @@ import { Warehouse } from 'src/warehouse/entities/warehouse.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { ImportExportService } from './import-export-service';
 import { ShipmentsFilterInput } from './dto/shipments-filters.input';
+import { ShipmentsOrderInput } from './dto/order-filters.input';
 
 @Injectable()
 export class ShipmentService {
@@ -72,9 +73,14 @@ export class ShipmentService {
     });
   }
 
-  findAll(shipmentsFilterInput: ShipmentsFilterInput) {
+  findAll(
+    shipmentsFilterInput: ShipmentsFilterInput,
+    shipmentsOrderInput: ShipmentsOrderInput,
+  ) {
     const { dateFrom, dateTo, warehouseId, productId, hazardous, type } =
       shipmentsFilterInput || {};
+
+    const { date } = shipmentsOrderInput || {};
 
     const dateFilter: FindOperator<Date> = (() => {
       if (dateFrom == undefined && dateTo == undefined) return undefined;
@@ -90,6 +96,7 @@ export class ShipmentService {
         product: { id: productId, hazardous },
         type,
       },
+      order: { date },
       relations: { warehouse: true, product: true },
     });
   }

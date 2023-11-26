@@ -3,6 +3,7 @@ import { ShipmentService } from './shipment.service';
 import { Shipment } from './entities/shipment.entity';
 import { CreateShipmentInput } from './dto/create-shipment.input';
 import { ShipmentsFilterInput } from './dto/shipments-filters.input';
+import { ShipmentsOrderInput } from './dto/order-filters.input';
 
 @Resolver(() => Shipment)
 export class ShipmentResolver {
@@ -19,8 +20,13 @@ export class ShipmentResolver {
   findAll(
     @Args('shipmentsFilterInput', { nullable: true })
     shipmentsFilterInput: ShipmentsFilterInput,
+    @Args('shipmentsOrderInput', { nullable: true })
+    shipmentsOrderInput: ShipmentsOrderInput,
   ) {
-    return this.shipmentService.findAll(shipmentsFilterInput);
+    return this.shipmentService.findAll(
+      shipmentsFilterInput,
+      shipmentsOrderInput,
+    );
   }
 
   @Query(() => Shipment, { name: 'shipment' })
